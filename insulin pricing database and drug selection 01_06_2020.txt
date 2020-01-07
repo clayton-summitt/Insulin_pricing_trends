@@ -1,0 +1,40 @@
+psql postgres
+
+#'Create the database' inside bash
+createdb insulinpricing
+
+# Inside insulinpricing database create a table with all of the appropriate column names to match with the CSV file header. '
+CREATE TABLE nadacpricing(NDC_Description VARCHAR ,NDC VARCHAR, NADAC_Per_Unit NUMERIC, Effective_Date DATE,Pricing_Unit VARCHAR,Pharmacy_Type_Indicator VARCHAR,OTC VARCHAR,Explanation_Code VARCHAR,Classification_for_Rate_Setting VARCHAR,Corresponding_Generic_Drug_NADAC_Per_Unit NUMERIC,Corresponding_Generic_Drug_Effective_Date DATE,As_of_Date DATE);
+
+#the file path to the 
+/Users/GuntherUlvanget/Dropbox/NADAC_downloads/NADAC/
+
+#examples of copying single CSV files to the table 'nadacpricing' inside the #insulinpricing database
+COPY nadacpricing
+FROM '/Users/GuntherUlvanget/Dropbox/NADAC_downloads/NADAC/NADAC_as_of_2014-03-26.csv'
+DELIMITER ',' CSV HEADER;
+
+
+COPY nadacpricing
+FROM '/Users/GuntherUlvanget/Dropbox/NADAC_downloads/NADAC/NADAC_as_of_2013-12-25.csv'
+DELIMITER ',' CSV HEADER;
+
+
+#copy all csv files the filepath #/Users/GuntherUlvanget/Dropbox/NADAC_downloads/NADAC with the generic  #NADAC*.csv filename into nadacpricing table. 
+
+for x in $(ls /Users/GuntherUlvanget/Dropbox/NADAC_downloads/NADAC/NADAC*.csv); do psql -c "COPY nadacpricing FROM '$x' CSV HEADER;" insulinpricing; done
+
+# to select Humulin and Humalog  and Tresiba use...
+
+ Select NDC_Description, NADAC_Per_Unit, As_of_Date DATE from nadacpricing                                                                                      WHERE NDC_Description like 'HUMA%'                                                                                                                                                         
+OR NDC_Description like 'HUMU%'
+or NDC_Description like 'TRESI%' 
+or NDC_Description like 'LEVEM%'                                                                                                                                                    
+or NDC_description like 'LANT%'
+or NDC_description like 'TOUJ%'       
+or NDC_description like 'NOVOL%'   
+or NDC_Description like 'FIAS%'  
+or NDC_Description like 'APID%'
+or NDC_Description like 'NOVOL%'
+                    limit 100;
+
